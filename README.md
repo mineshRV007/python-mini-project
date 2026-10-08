@@ -1,47 +1,41 @@
 # Shopping Bill Generator
 
-A menu-driven Python mini project that adds shopping items to a cart and prints a bill with an automatic discount. Prices are displayed in Indian rupees (INR).
+A Python mini project with a Flask website and the original terminal program.
+Add items, view the cart, calculate a discount, clear the cart, and print a dated bill or save it as PDF using the browser's print dialog.
 
-## Features
+## Deploy on Render
 
-- Add items with a name, quantity, and unit price.
-- View the shopping cart and item totals.
-- Calculate a subtotal and apply a discount.
-- Generate a dated bill for ABC GENERAL STORE.
-- Clear the cart after confirmation.
-- Check for empty names, non-positive quantities/prices, and invalid numeric input.
+1. Extract the ZIP and upload the contents of `shopping-bill-generator-web` into your GitHub repository. Keep `app.py`, `requirements.txt`, `render.yaml`, and the `templates` folder together at the repository root.
+2. Connect that repository to a Render Web Service with Python 3 as its language.
+3. Leave Root Directory empty if you uploaded the files to the repository root.
+4. Set Build Command to `pip install -r requirements.txt`.
+5. Set Start Command to `gunicorn app:app --bind 0.0.0.0:$PORT`.
+6. Choose the Free instance type if available for your account.
+7. Add an environment variable named `SECRET_KEY` with a long random value (Render can generate one). Keep it private and stable between deployments.
+8. Save the settings, then select Manual Deploy → Deploy latest commit.
 
-## Requirements
+Alternatively, create a Render Blueprint using the included `render.yaml`; it includes the commands and generates SECRET_KEY automatically.
 
-- Python 3.6 or newer (Python 3.12 recommended).
-- A terminal that supports the rupee symbol (₹).
-- No third-party packages are required.
+If you uploaded the whole parent folder instead, set Root Directory to `shopping-bill-generator-web`.
 
-## Run the project
+Official guide: https://render.com/docs/deploy-flask
 
-Download or clone this repository, open a terminal in its folder, and run:
+## Run locally
+
+Requires Python 3.9 or newer.
+
+```bash
+python -m pip install -r requirements.txt
+python app.py
+```
+
+Open http://localhost:5000 in your browser. Gunicorn is used on Render's Linux environment; it is not needed to start the app on Windows.
+
+To run the original terminal version:
 
 ```bash
 python main.py
 ```
-
-On Windows, you can also use:
-
-```powershell
-py main.py
-```
-
-## Menu
-
-```text
-1. Add Item
-2. View Cart
-3. Generate Bill
-4. Clear Cart
-5. Exit
-```
-
-Choose an option and follow the prompts. For example, add 2 units of Rice at ₹300 each, then choose Generate Bill. The subtotal is ₹600, the discount is ₹30 (5%), and the grand total is ₹570.
 
 ## Discount rules
 
@@ -51,29 +45,13 @@ Choose an option and follow the prompts. For example, add 2 units of Rice at ₹
 | ₹500 to below ₹1,000 | 5% |
 | ₹1,000 or more | 10% |
 
-## Python concepts used
+The web version uses decimal arithmetic with prices rounded to two decimal places. Each browser session has its own cart, limited to 20 items. Carts are temporary; this project has no database, payments, or saved bill history. The bill date uses the server's clock. Configure SECRET_KEY to preserve session validity across restarts. Without it, a temporary key is generated at startup.
 
-Functions, lists, dictionaries, loops, conditional statements, exception handling, formatted strings, and the standard-library `datetime` module.
+## Files
 
-## Project files
-
-```text
-shopping-bill-generator/
-├── main.py
-├── README.md
-└── .gitignore
-```
-
-## Notes
-
-This is an educational command-line project. The cart is kept in memory and is lost when the program exits. Bills are displayed in the terminal; they are not saved to a file. Generating a bill does not clear the cart. The program uses floating-point numbers for prices.
-
-## Upload to GitHub
-
-1. Extract the ZIP file on your computer.
-2. Open or create your GitHub repository.
-3. Select **Add file → Upload files** (or **uploading an existing file** in an empty repository).
-4. Upload the files inside `shopping-bill-generator`, including `.gitignore`.
-5. Enter a commit message such as `Add Shopping Bill Generator mini project`, then select **Commit changes**.
-
-Upload the extracted files so GitHub can display the Python source and README directly.
+- `app.py`: Flask application and billing logic.
+- `templates/index.html`: Responsive website and printable bill.
+- `requirements.txt`: Python dependencies.
+- `render.yaml`: Render deployment configuration.
+- `main.py`: Original terminal project.
+- `.gitignore`: Excludes generated files and local secrets.
