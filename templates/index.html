@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Shopping Bill Generator</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f3f5f1;color:#20322a;font:16px system-ui,sans-serif}main{max-width:1020px;margin:48px auto;padding:0 20px}.eyebrow{color:#617367;font-size:12px;letter-spacing:2px;font-weight:700}h1{font-size:36px;letter-spacing:-1px;margin:12px 0}p{color:#627168;line-height:1.6}.layout{display:grid;grid-template-columns:300px 1fr;gap:24px;margin-top:28px}.card{background:white;border:1px solid #dce4dd;border-radius:16px;padding:26px}h2{margin-top:0;font-size:20px}label{display:block;font-size:14px;font-weight:600;margin:18px 0 7px}input{width:100%;padding:12px;border:1px solid #c9d6cc;border-radius:8px;font:inherit}button{padding:12px 18px;border:0;border-radius:8px;background:#256143;color:white;font:inherit;font-weight:600;cursor:pointer}.add{width:100%;margin-top:22px}.muted{background:#edf2ed;color:#334e3c}.actions{display:flex;gap:10px;margin-top:24px}.notice{padding:14px 18px;background:#e0eddf;border-radius:8px;margin-top:15px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;padding:14px 6px;border-bottom:1px solid #e4eae4}th:first-child,td:first-child{text-align:left;overflow-wrap:anywhere}th{color:#687a6d}.totals{margin:22px 0 0 auto;max-width:300px}.row{display:flex;justify-content:space-between;margin:14px 0;gap:18px}.grand{font-size:22px;font-weight:700;border-top:1px solid #dce4dd;padding-top:18px}.small{font-size:13px}.empty{padding:40px 0;text-align:center}.thanks{text-align:center;margin-top:24px}@media(max-width:760px){main{margin:24px auto}.layout{grid-template-columns:1fr}h1{font-size:30px}}@media print{body{background:white}main{margin:0;max-width:none}.intro,.entry,.actions,.notice,.footnote{display:none}.layout{display:block;margin:0}.card{border:0;padding:0}button{display:none}}
+  </style>
+</head>
+<body><main>
+  <div class="intro"><div class="eyebrow">PYTHON MINI PROJECT</div><h1>Shopping Bill Generator</h1><p>Add your items, review the automatic discount, and print your bill.</p></div>
+  {% for message in get_flashed_messages() %}<div class="notice" role="status">{{ message }}</div>{% endfor %}
+  <div class="layout">
+    <section class="card entry"><h2>Add an item</h2>
+      <form method="post"><input type="hidden" name="csrf" value="{{ session.csrf }}"><input type="hidden" name="action" value="add">
+        <label for="name">Item name</label><input id="name" name="name" maxlength="40" required placeholder="e.g. Rice">
+        <label for="quantity">Quantity</label><input id="quantity" name="quantity" type="number" min="1" max="10000" step="1" value="1" required>
+        <label for="price">Price per unit (₹)</label><input id="price" name="price" type="number" min="0.01" max="1000000" step="0.01" required placeholder="0.00">
+        <button class="add" type="submit">Add to cart</button>
+      </form><p class="small">5% off from ₹500.<br>10% off from ₹1,000.</p>
+    </section>
+    <section class="card"><div class="eyebrow">ABC GENERAL STORE</div><h2 style="margin-top:12px">Your shopping bill</h2><p class="small">Date: {{ date }}</p>
+      {% if items %}<div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead><tbody>
+      {% for item in items %}<tr><td>{{ item.name }}</td><td>{{ item.quantity }}</td><td>{{ item.price|inr }}</td><td>{{ item.total|inr }}</td></tr>{% endfor %}
+      </tbody></table></div>
+      <div class="totals"><div class="row"><span>Subtotal</span><span>{{ subtotal|inr }}</span></div><div class="row"><span>Discount ({{ rate }}%)</span><span>−{{ discount|inr }}</span></div><div class="row grand"><span>Total</span><span>{{ grand_total|inr }}</span></div></div>
+      <div class="actions"><button type="button" onclick="window.print()">Print / Save PDF</button><form method="post" onsubmit="return confirm('Clear all items from your cart?')"><input type="hidden" name="csrf" value="{{ session.csrf }}"><input type="hidden" name="action" value="clear"><button class="muted" type="submit">Clear cart</button></form></div>
+      <p class="small thanks">Thank you for shopping!</p>
+      {% else %}<div class="empty"><h2>Your cart is empty</h2><p>Add your first item to start a bill.</p></div>{% endif %}
+    </section>
+  </div><p class="small footnote">An educational billing project. Your cart is stored temporarily in this browser session.</p>
+</main></body></html>
